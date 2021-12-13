@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  	<mapper namespace="com.company.mapper.UserMapper">
+  		
+  		
+  		<!-- 회원가입 -->
+  		<insert id="user_create">
+  			insert into user_jrg (uname, uid, upass, ubirth, uaddress, uemail,uphone, uip) values (#{uname}, #{uid}, #{upass}, #{ubirth}, #{uaddress}, #{uemail}, #{uphone}, #{uip}) 
+  		
+  		</insert>
+  		
+  		<!-- 로그인 -->
+  		<select id="user_login" resultType="int">
+  			select count(*) cnt from user_jrg where uid = #{uid} and upass = #{upass}
+  		</select>
+  		
+  		<!-- 본인확인  -->
+  		<select id="user_info" resultType="UserDto">
+  			select * from user_jrg where uid = #{uid} and upass= #{upass}
+  		</select>
+  		
+  		<update id="user_update" >
+  			update user_jrg set upass = #{upass}, uaddress = #{uaddress}, uemail = #{uemail}, uphone = #{uphone}, ubirth = #{ubirth}
+  			where uid = #{uid} 
+  		</update>
+  		<!-- 회원정보수정 -->
+  		
+  		<delete id="user_delete">
+  			delete from user_jrg where uid = #{uid} and upass = #{upass}
+  		</delete>
+  		
+  		<!-- uno가져오기  -->
+  		<select id="user_uno" resultType="UserDto">
+  			select uno from user_jrg where uid = #{uid}
+  		</select>
+  	
+  		<!-- 아이디 중복확인 -->
+  		<select id ="doubleid" resultType ="int">
+           select count(*) cnt from user_jrg where uid = #{uid}
+        
+        </select>
+        
+        <!--  아이디 찾기 -->
+        <select id ="searchid" resultType ="UserDto">
+           	select * from user_jrg where uname = #{uname} and uemail = #{uemail} and uphone = #{uphone}
+        
+        </select>
+        
+        <!--  비밀번호 바꾸기 전 아이디 찾기 -->
+        <select id ="searchpass" resultType ="int">
+           	select count(*) cnt from user_jrg where uid = #{uid} and uname = #{uname} and uemail = #{uemail} and uphone = #{uphone}     
+        </select>
+        
+        <!--  비밀번호 바꾸기 -->
+        <update id ="updatepass">
+           	update user_jrg set upass = #{upass} where uid = #{uid}       
+        </update>
+  	</mapper>

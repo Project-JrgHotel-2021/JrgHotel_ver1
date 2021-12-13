@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.company.mapper.ReservationMapper">
+  
+  	<!-- dto  -->
+  	 	<resultMap type="ReservationDto" id="reservationMap">
+  		<id property="rno" column="rno"></id>
+  		<id property="rspa" column="rspa"></id>
+  		<id property="rswim" column="rswim"></id>
+  		<id property="rbreakfast" column="rbreakfast"></id>
+  		<id property="rbar" column="rbar"></id>
+  		<id property="bedno" column="bedno"></id>
+  		<id property="radult" column="radult"></id>
+  		<id property="rkid" column="rkid"></id>
+  		<id property="raddbed" column="raddbed"></id>
+  		<id property="rnote" column="rnote"></id>
+  		<id property="rcheckin" column="rcheckin"></id>
+  		<id property="rcheckout" column="rcheckout"></id>
+  		<id property="checkreservation" column="checkreservation"></id>
+  		<id property="rdate" column="rdate"></id>
+  		<id property="uno" column="uno"></id>
+  		<id property="mno" column="mno"></id>
+  		<id property="hno" column="hno"></id>
+  		<id property="rtotalprice" column="rtotalprice"></id>
+  	</resultMap>
+  	
+  	<resultMap type="RoomimageDto" id="roomimageMap">
+  		<id property="rino" column="rino"></id>
+  		<id property="riimage" column="riimage"></id>
+  		<id property="mno" column="mno"></id>
+  	</resultMap>
+  	
+  	<resultMap type="ReservationResultDto" id="reservationResultMap">
+  		<collection property="reservationDto" resultMap="reservationMap"></collection>
+  		<collection property="roomimageDto" resultMap="roomimageMap"></collection>
+  	</resultMap>
+  	
+  	<!-- 해당회원 예약리스트 가져오기 -->
+  	<select id="reservationList" resultType="ReservationDto">
+  		select * from reservation where uno in (select uno from user_jrg where uid = #{uid}) order by (case when checkreservation='n' then 1 else 2 end), rno
+  	</select>
+  	
+  	<!-- 예약자 성함 -->
+  	<select id="reservationUname" resultType="String">
+  		select uname from user_jrg where uid = #{uid}
+  	</select>
+  	
+  	<!-- 예약상세내역 -->
+  	<select id="reservationDetail" resultMap="reservationResultMap">
+  		select a.*, b.riimage from reservation a join roomimage b on a.mno = b.mno where rno = #{rno}
+  	</select>
+  	
+  	<!-- 예약상세내역 - 룸타입구하기 -->
+  	<select id="reservationRoomtype" resultType="RoomTypeDto">
+  		select  * from roomtype where rtno  = (select rtno from room where mno = (select mno from reservation where rno = #{rno}))
+  	</select>
+  	
+  	<!-- 옵션별 가격 가져오기-->
+  	<select id="reservationAddOption" resultType="OptionDto">
+  		 select * from addoption;
+  	</select>
+  	
+  	<!-- 예약취소 -->
+  	<delete id="reservationDelete" parameterType="HashMap">
+  		delete from reservation where rno = #{rno} and uno = (select uno from user_jrg where uid = #{uid} and uname = #{uname})
+  	</delete>
+  	
+  	<!-- 예약하기  -->
+  	<insert id="reserve">
+  		insert into reservation (rspa,rswim,rbreakfast,rbar,bedno,raddbed,radult,rkid,rnote,rcheckin,rcheckout,uno,mno,hno,rtotalprice)
+  					values ( #{rspa},#{rswim},#{rbreakfast},#{rbar},#{bedno},#{raddbed},#{radult},#{rkid},#{rnote},#{rcheckin},#{rcheckout},#{uno},#{mno},#{hno},#{rtotalprice})
+  	</insert>
+  	
+  	<!-- 예약한 후 예약내역 확인  -->
+  	<select id = "reservation_done" resultType = "ReDoneDto">
+   <!-- 호텔(hotel - hname), 객실(roomtype - rtname), 예약일(reservation checkreservation ),체크인 체크아웃(reservation - rckeckin, rcheckout)  -->
+      select h.hname, rt.rtname, r.rdate, r.rcheckin, r.rcheckout
+       from hotel h join  roomtype rt   join  reservation r join room m
+       on r.mno = m.mno and r.hno = h.hno and rt.rtno = m.rtno and r.uno = #{uno} order by r.rno desc limit 0,1 ;
+   </select>
+   
+  </mapper>

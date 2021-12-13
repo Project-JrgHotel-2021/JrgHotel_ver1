@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.company.mapper.BoardMapper">
+  
+    
+  <resultMap type="UserDto" id="userMap">
+  		<id property="uno" column="uno"/>
+  		<id property="uname" column="uname"/>
+  	</resultMap>
+  	
+  	<resultMap type="BoardDto" id="boardMap">
+  		<id property="bno" column="bno"/>
+  		<id property="uno" column="uno"/>
+  		<id property="btitle" column="btitle"/>
+  		<id property="bcontent" column="bcontent"/>
+  		<id property="bdate" column="bdate"/>
+  		<id property="bupdate" column="bupdate"/>
+  		<id property="bip" column="bip"/>
+  		<id property="bcheck" column="bcheck"/>
+  	</resultMap>
+  	
+  	<resultMap type="AnswerDto" id="answerMap">
+  		<id property="ano" column="ano"/>
+  		<id property="answer" column="answer"/>
+  		<id property="aupdate" column="aupdate"/>
+  		<id property="bno" column="bno"/>
+  	</resultMap>
+  	
+  	<resultMap type="BoardResultDto" id="boardResultMap">
+  		<collection property="boardDto" resultMap="boardMap"></collection>
+  		<collection property="userDto" resultMap="userMap"></collection>
+  		<collection property="answerDto" resultMap="answerMap"></collection>
+  	</resultMap>
+  
+  	<!-- 문의글 작성 -->
+  	<insert id="boardWriter">
+  		insert into  board_jrg (btitle, bcontent, bip ,uno) select #{btitle}, #{bcontent}, #{bip}, uno from user_jrg where uid = #{uid}
+  	</insert>
+  	
+  	<!-- 문의글 작성 한 후 답변테이블 default -->
+
+
+	<insert id="answerDefault">
+		insert into answer (bno) select bno from board_jrg 
+			where uno = (select uno from user_jrg where uid = #{uid}) 
+				order by bdate  desc limit 1
+	</insert>
+  	
+  	<!-- 문의내역가져오기 -->
+  	<select id="boardList" resultMap="boardResultMap">
+  		select b.*, a.answer, c.uname 
+	  		from board_jrg b 
+	  			join answer a join user_jrg c 
+	  				on a.bno = b.bno and b.uno = c.uno 
+	  					where b.uno = (select uno from user_jrg where uid = #{uid})
+  	</select>
+  	
+  	<!-- 문의내용수정하기 -->
+  	<update id="boardUpdate" >
+  		update board_jrg 
+  			set btitle = #{btitle} , bcontent = #{bcontent} 
+  				where bno = #{bno} 
+  					and uno = (select uno from user_jrg where uid = #{uid} and upass = #{upass})
+  	</update>
+  	
+  	<!-- 문의글삭제하기 -->
+  	<delete id="boardDelete">
+  		delete from board_jrg 
+  			where bno = #{bno} 
+  				and uno = (select uno from user_jrg where uid = #{uid} and upass = #{upass})
+  	</delete>
+  </mapper>

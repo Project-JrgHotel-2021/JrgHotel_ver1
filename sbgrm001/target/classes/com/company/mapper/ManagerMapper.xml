@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.company.mapper.ManagerMapper">
+  
+     <!--  예약대기리스트 가져오기 -->
+     <select id="reservationList_m" resultType="ReservationDto">
+        select a.*, b.uname, b.uid 
+        	from reservation a join user_jrg b on a.uno = b.uno 
+        		where a.checkreservation='N' 
+     </select>
+     
+     <!-- 예약완료리스트 가져오기 -->
+     <select id="reservationComList_m" resultType="ReservationDto">
+        select a.*, b.uname, b.uid 
+        	from reservation a join user_jrg b on a.uno = b.uno 
+        		where a.checkreservation='Y' 
+     </select>
+     
+     <!-- 예약승인하기 -->
+     <update id="reservationCheck_m">
+        update reservation set checkreservation='Y' 
+        	where rno = #{rno}
+     </update>
+     
+     
+     
+     <resultMap type="UserDto" id="userMap">
+        <id property="uno" column="uno"/>
+        <id property="uname" column="uname"/>
+     </resultMap>
+     
+     <resultMap type="BoardDto" id="boardMap">
+        <id property="bno" column="bno"/>
+        <id property="uno" column="uno"/>
+        <id property="btitle" column="btitle"/>
+        <id property="bcontent" column="bcontent"/>
+        <id property="bdate" column="bdate"/>
+        <id property="bupdate" column="bupdate"/>
+        <id property="bip" column="bip"/>
+        <id property="bcheck" column="bcheck"/>
+     </resultMap>
+     
+     <resultMap type="AnswerDto" id="answerMap">
+        <id property="ano" column="ano"/>
+        <id property="answer" column="answer"/>
+        <id property="aupdate" column="aupdate"/>
+        <id property="bno" column="bno"/>
+     </resultMap>
+     
+     <resultMap type="BoardResultDto" id="boardResultMap">
+        <collection property="boardDto" resultMap="boardMap"></collection>
+        <collection property="userDto" resultMap="userMap"></collection>
+        <collection property="answerDto" resultMap="answerMap"></collection>
+        
+     </resultMap>
+     
+     <!-- 문의리스트 가져오기 : 답변대기 -->
+     <select id="boardList_m" resultMap="boardResultMap">
+        select a.*,b.uname 
+        	from board_jrg a join user_jrg b on a.uno = b.uno 
+        		where a.bcheck='N' 
+     </select>
+     
+     <!-- 문의리스트 가져오기 : 답변완료 -->
+     <select id="boardComList_m" resultMap="boardResultMap">
+        select a.*,  b.uname 
+        	from board_jrg a 	join user_jrg b  on a.uno = b.uno 	
+        			where a.bcheck='Y' 
+     </select>
+     
+     <!-- 문의글 자세히보기 -->
+     <select id="boardDetail_m" resultMap="boardResultMap">
+        select a.*, b.*, c.uname 
+        	from answer a join board_jrg b join user_jrg c 
+        		on a.bno = b.bno and b.uno = c.uno 
+        			where b.bno = #{bno}
+     </select>
+     
+     <!-- 답변쓰기 -->
+     <insert id="commentInsert" >
+     	insert into answer (answer, bno) values (#{answer}, #{bno})
+     </insert>
+     
+     <!-- 답변쓴 후 -> bcheck='Y' -->
+     <update id="boardCheck_Y">
+        update board_jrg set bcheck='Y' where bno = #{bno}
+     </update>
+     
+     <!-- 답변쓴 후에 default 답변 없애기 -->
+     <delete id="commentDelete_defaultDelete">
+       delete from answer where adate = (select adate from (select adate from answer where bno = #{bno} order by adate asc limit 1) as answer_t);
+     </delete>
+     
+     <!-- 답변삭제하기 -->
+     <delete id="commentDelete">
+        delete from answer where ano = #{ano}
+     </delete>
+     
+     <!-- 답변삭제 후 답변여부 'N'으로 고치기 -->
+     <update id="boardCheck_N">
+     	update board_jrg set bcheck='N' where bno = #{bno}
+     </update>
+     
+     <!-- 답변삭제 후에 default 답변 넣기 -->
+     <insert id="commentDelete_defaultInsert">
+        insert into answer (bno) values (#{bno}) 
+     </insert>
+     
+     <!-- 답변수정 -->
+     <update id="commentUpdate">
+        update answer set answer = #{answer} where ano = #{ano}
+     </update>
+  </mapper>

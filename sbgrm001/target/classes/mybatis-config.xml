@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<typeAliases>
+		<typeAlias alias="UserDto" type="com.company.dto.UserDto" />
+		<typeAlias alias="RoomDto" type="com.company.dto.RoomDto" />
+		<typeAlias alias="CaroDto" type="com.company.dto.CaroDto" />
+		<typeAlias alias="HotelDescDto" type="com.company.dto.HotelDescDto" />
+		<typeAlias alias="RePageDto" type="com.company.dto.RePageDto" />
+		<typeAlias alias="ReservationDto" type="com.company.dto.ReservationDto" />
+		<typeAlias alias="OptionDto" type="com.company.dto.OptionDto" />
+		<typeAlias alias="ReDoneDto" type="com.company.dto.ReDoneDto" />
+		<typeAlias alias="QnaDto" type="com.company.dto.QnaDto" />
+		<typeAlias alias="OptionDto" type="com.company.dto.OptionDto"></typeAlias>
+		<typeAlias alias="BoardDto" type="com.company.dto.BoardDto"></typeAlias>
+		<typeAlias alias="AnswerDto" type="com.company.dto.AnswerDto"></typeAlias>
+		<typeAlias alias="BoardResultDto" type="com.company.dto.BoardResultDto"></typeAlias>
+		<typeAlias alias="RoomTypeDto" type="com.company.dto.RoomTypeDto"></typeAlias>
+		<typeAlias type="com.company.dto.RoomimageDto" alias="RoomimageDto"/>
+		<typeAlias type="com.company.dto.ReservationResultDto" alias="ReservationResultDto"/>
+	</typeAliases>
+</configuration>

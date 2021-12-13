@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.company.mapper.RePageMapper">
+	
+	<!-- 빈방 목록보기 -->
+	<select id = "reList" parameterType="hashMap" resultType="RePageDto">
+		select c.cname,r.mno,rt.rtname,rt.rtprice,rt.rtmax,ri.riimage from city c,room r,hotel h,roomtype rt,roomimage ri where r.mno
+		not in ( select mno from reservation where (rcheckout between date_add( #{rcheckin} , interval 1 day) and 
+		#{rcheckout} ) or (rcheckin between #{rcheckin} and date_sub( #{rcheckout} , interval 1 day) ) or 
+		(rcheckin  &lt; #{rcheckin} and rcheckout &gt; #{rcheckout} ) ) and r.rtno=rt.rtno and h.hno = r.hno and ri.mno = r.mno and h.cno=c.cno 
+		and ( h.cno in (${cno}) ) order by r.mno asc
+	</select>
+
+	<!-- 옵션 총액 가져오기 -->
+	<select id = "total_price" parameterType="hashMap" resultType="int">
+		select (select #{num1} * opprice from addOption where opno = #{opno1} ) + (select #{num2}*opprice from addOption where opno=#{opno2}  )
+				+ (select #{num3} * opprice from addOption where opno = #{opno3} ) + (select #{num4} * opprice from addOption where opno = #{opno4} )
+				+ (select #{opno5} * opprice from addOption where opno = 5 )
+		  from dual;
+	</select>
+	
+	<!-- 빈방 목록보기(가격 높은순) -->
+	<select id = "reListHigh" parameterType="hashMap" resultType="RePageDto">
+		select c.cname,r.mno,rt.rtname,rt.rtprice,rt.rtmax,ri.riimage from city c,room r,hotel h,roomtype rt,roomimage ri where r.mno
+		not in ( select mno from reservation where (rcheckout between date_add( #{rcheckin} , interval 1 day) and 
+		#{rcheckout} ) or (rcheckin between #{rcheckin} and date_sub( #{rcheckout} , interval 1 day) ) or 
+		(rcheckin  &lt; #{rcheckin} and rcheckout &gt; #{rcheckout} ) ) and r.rtno=rt.rtno and h.hno = r.hno and ri.mno = r.mno and h.cno=c.cno 
+		and ( h.cno in (${cno}) ) order by rt.rtprice desc
+	</select>
+	
+	<!-- 빈방 목록보기(가격 낮은순) -->
+	<select id = "reListLow" parameterType="hashMap" resultType="RePageDto">
+		select c.cname,r.mno,rt.rtname,rt.rtprice,rt.rtmax,ri.riimage from city c,room r,hotel h,roomtype rt,roomimage ri where r.mno
+		not in ( select mno from reservation where (rcheckout between date_add( #{rcheckin} , interval 1 day) and 
+		#{rcheckout} ) or (rcheckin between #{rcheckin} and date_sub( #{rcheckout} , interval 1 day) ) or 
+		(rcheckin  &lt; #{rcheckin} and rcheckout &gt; #{rcheckout} ) ) and r.rtno=rt.rtno and h.hno = r.hno and ri.mno = r.mno and h.cno=c.cno 
+		and ( h.cno in (${cno}) ) order by rt.rtprice asc
+	</select>
+</mapper>
